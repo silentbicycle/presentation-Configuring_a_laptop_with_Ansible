@@ -1,0 +1,14 @@
+Configuring Laptops with Ansible
+
+==================================================
+
+Setting up a new laptop can be disorienting. It's easy to forget all the
+little configuration tweaks that accumulated over time. With only a
+little work upfront, a configuration management system can turn those
+notes into executable documentation, making it easy to reproduce a
+heavily customized setup on other laptops down the line.
+
+While there are several configuration management systems, I am going to
+focus on Ansible, because it's easy to set up locally. No experience
+with Ansible or other configuration management tools systems is assumed.
+

@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">    
+<head>
+    <meta charset="utf-8">
+    <title>Title: Subtitle</title>
+    <link rel="stylesheet" href="reveal_js/css/reveal.css">
+    <link rel="stylesheet" href="custom.css" id="theme">
+</head>
+ 
+<body>
+    <div class="reveal">
+        <div class="slides">
+<section id="configuring-a-laptop-with-ansible" class="level1">
+<h1>Configuring a Laptop with Ansible</h1>
+<p>by Scott Vokes (<a href="https://github.com/silentbicycle/">@silentbicycle</a>)</p>
+</section>
+<section id="setting-up-custom-environments" class="level1">
+<h1>Setting up custom environments</h1>
+</section>
+<section id="section" class="level1">
+<h1></h1>
+<ul>
+<li>Configuration Management</li>
+<li>Using Ansible</li>
+<li>Configuring an OSX laptop</li>
+</ul>
+</section>
+<section id="configuration-management" class="level1">
+<h1><strong>Configuration Management</strong></h1>
+</section>
+<section id="configuration-management-1" class="level1">
+<h1>Configuration Management</h1>
+<ul>
+<li>chef</li>
+<li>puppet</li>
+<li>ansible</li>
+<li>your favorite tool (I forgot)</li>
+</ul>
+</section>
+<section id="what-to-do-vs.how-to-get-there" class="level1">
+<h1>What To Do <br>vs.<br>How to Get There</h1>
+<!--
+shell scripts give the program a series of instructions.
+error handling?
+
+CM tools give the program a map, an address, and a bus pass.
+it'll figure it out.
+-->
+</section>
+<section id="section-1" class="level1">
+<h1></h1>
+<figure>
+<img src="images/michigan_map-british_library.jpg" alt="" />
+</figure>
+<!--
+https://www.flickr.com/photos/britishlibrary/11113292726/
+Credit: Flickr, The British Library
+-->
+</section>
+<section id="ansible" class="level1">
+<h1><strong>Ansible</strong></h1>
+</section>
+<section id="ansible-1" class="level1">
+<h1>Ansible</h1>
+<ul>
+<li>server-less</li>
+<li>based on SSH and Python</li>
+</ul>
+</section>
+<section id="modules" class="level1">
+<h1>Modules</h1>
+<pre><code>$ ansible -m ping localhost</code></pre>
+</section>
+<section id="modules-1" class="level1">
+<h1>Modules</h1>
+<pre><code>localhost | success &gt;&gt; {
+    &quot;changed&quot;: false, 
+    &quot;ping&quot;: &quot;pong&quot;
+}</code></pre>
+</section>
+<section id="modules-2" class="level1">
+<h1>Modules</h1>
+<pre><code>$ ansible -m apt
+  -a &quot;name=cowsay state=present&quot; localhost</code></pre>
+</section>
+<section id="modules-3" class="level1">
+<h1>Modules</h1>
+<pre><code>$ ansible -K -m apt
+  -a &quot;name=cowsay state=present&quot; localhost</code></pre>
+<p>For when you need sudo.</p>
+</section>
+<section id="docs" class="level1">
+<h1>Docs</h1>
+<ul>
+<li><code>ansible-doc -l | --list</code></li>
+<li><code>ansible-doc file</code></li>
+</ul>
+</section>
+<section id="template-module" class="level1">
+<h1>Template module</h1>
+<p>Uses jinja2 templates, e.g. '{{variable}}'</p>
+<pre><code>- template: src=foo.j2 dest=/etc/file.conf
+  owner=bin group=wheel mode=0644</code></pre>
+</section>
+<section id="playbooks" class="level1">
+<h1>Playbooks</h1>
+<ul>
+<li>run sequentially</li>
+<li>can run on multiple hosts</li>
+<li>can include other stuff</li>
+</ul>
+</section>
+<section id="yaml" class="level1">
+<h1>YAML</h1>
+<pre><code>- name: YAML example
+  dict:
+    property: not Turing-complete
+    some_list:
+      - stuff
+      - more stuff</code></pre>
+</section>
+<section id="facts" class="level1">
+<h1>Facts</h1>
+</section>
+<section id="section-2" class="level1">
+<h1></h1>
+<figure>
+<img src="images/faxed_newspaper-Nationaal_Archief.jpg" alt="" />
+</figure>
+<!--
+https://www.flickr.com/photos/nationaalarchief/4193509648/
+Credit: Flickr, Nationaal Archief
+-->
+</section>
+<section id="inventory" class="level1">
+<h1>Inventory</h1>
+<ul>
+<li><code>hosts</code> file</li>
+</ul>
+</section>
+<section id="inventory-1" class="level1">
+<h1>Inventory</h1>
+<pre><code>localhost</code></pre>
+</section>
+<section id="inventory-2" class="level1">
+<h1>Inventory</h1>
+<pre><code>localhost
+
+[group]
+name1
+name2
+etc</code></pre>
+</section>
+<section id="an-example-playbook" class="level1">
+<h1>An example playbook</h1>
+</section>
+<section id="section-3" class="level1">
+<h1></h1>
+<pre><code>---
+- hosts: servers
+  tasks:
+  - name: install cowsay
+    sudo: yes
+    when: ansible_os_family == &quot;Debian&quot;
+    apt:
+      name: cowsay
+      state: present
+      
+  - include: install_ssh_keys.yml</code></pre>
+</section>
+<section id="running-playbooks" class="level1">
+<h1>Running Playbooks</h1>
+<pre><code>$ ansible-playbook -i hosts playbook.yml</code></pre>
+</section>
+<section id="running-playbooks-1" class="level1">
+<h1>Running Playbooks</h1>
+<pre><code>$ ansible-playbook -i hosts -K playbook.yml</code></pre>
+<p>Again, for when some tasks need sudo.</p>
+</section>
+<section id="playbook-options" class="level1">
+<h1>Playbook options</h1>
+<ul>
+<li><code>--syntax-check</code></li>
+<li><code>--check</code> (dry run)</li>
+<li><code>--list-tasks</code> and <code>--list-hosts</code></li>
+<li><code>--start TASK_NAME</code></li>
+</ul>
+</section>
+<section id="roles" class="level1">
+<h1>Roles</h1>
+<!-- 
+- modularity / reuse
+- kind of like Chef cookbooks
+-->
+</section>
+<section id="section-4" class="level1">
+<h1></h1>
+<figure>
+<img src="images/rolling_down_a_hill-woodleywonderworks.jpg" alt="" />
+</figure>
+<!--
+https://www.flickr.com/photos/wwworks/251970855/
+Credit: Flickr, woodleywonderworks
+-->
+</section>
+<section id="roles-1" class="level1">
+<h1>Roles</h1>
+<pre><code>---
+- hosts: servers
+  roles:
+  - common
+  - firewall
+  - { role: irc, when: irc_server is defined }</code></pre>
+</section>
+<section id="roles-2" class="level1">
+<h1>Roles</h1>
+<ul>
+<li><code>roles/ROLE_NAME/</code></li>
+<li><code>tasks/main.yml</code></li>
+<li><code>templates/</code></li>
+<li><code>handlers/</code></li>
+<li>etc.</li>
+</ul>
+</section>
+<section id="host-and-group-variables" class="level1">
+<h1>Host and Group Variables</h1>
+<ul>
+<li><code>host_vars/HOSTNAME</code> -&gt; YAML file</li>
+<li><code>group_vars/HOSTNAME</code> -&gt; YAML file</li>
+</ul>
+</section>
+<section id="configuring-a-laptop" class="level1">
+<h1><strong>Configuring a laptop</strong></h1>
+</section>
+<section id="linuxosxor-bsd" class="level1">
+<h1>Linux,<br>OSX,<br>or BSD</h1>
+</section>
+<section id="packaging" class="level1">
+<h1>Packaging</h1>
+<ul>
+<li>apt, yum, pacman, ...</li>
+<li>homebrew &amp; homebrew_cask</li>
+<li>pkgng, openbsd_pkg, ...</li>
+</ul>
+</section>
+<section id="windows" class="level1">
+<h1>(Windows?)</h1>
+<ul>
+<li>win_*</li>
+</ul>
+</section>
+<section id="getting-startedosx-version" class="level1">
+<h1>Getting started<br>(OSX version)</h1>
+</section>
+<section id="open-the-laptop" class="level1">
+<h1>Open the laptop</h1>
+</section>
+<section id="select-language-keyboard-layout" class="level1">
+<h1>Select language &amp; keyboard layout</h1>
+</section>
+<section id="get-on-the-wifi" class="level1">
+<h1>Get on the wifi</h1>
+</section>
+<section id="get-the-playbook" class="level1">
+<h1>Get the playbook</h1>
+<pre><code>$ git clone ssh://YOUR_HOST/PATH</code></pre>
+<ul>
+<li>May install Command Line Tools</li>
+</ul>
+</section>
+<section id="bootstrap-script" class="level1">
+<h1>Bootstrap script</h1>
+<p>Run <code>bin/bootstrap_osx</code></p>
+<ul>
+<li>Install homebrew</li>
+<li>(Should have Command Line Tools by now)</li>
+<li>Install Ansible</li>
+</ul>
+</section>
+<section id="link-paths" class="level1">
+<h1>Link paths</h1>
+<ul>
+<li><code>bin/link_paths</code> (optional)</li>
+</ul>
+</section>
+<section id="ssh-keys" class="level1">
+<h1>SSH keys</h1>
+</section>
+<section id="section-5" class="level1">
+<h1></h1>
+<figure>
+<img src="images/keys_USS_Bowfin-Joseph_Novak.jpg" alt="" />
+</figure>
+<!--
+https://www.flickr.com/photos/josephleenovak/5559755789/
+Credit: Flickr, josephleenovak
+-->
+</section>
+<section id="ssh-keys-1" class="level1">
+<h1>SSH keys</h1>
+<p>Run <code>bin/setup_ssh_key</code> (optional)</p>
+<ul>
+<li>Enable &quot;remote login&quot; if using SSH</li>
+<li>Ensure that <code>ssh localhost</code> works without a password</li>
+<li>Otherwise, use <code>-c local</code></li>
+</ul>
+</section>
+<section id="run-the-playbook" class="level1">
+<h1>Run the Playbook</h1>
+<ul>
+<li>Took 15-20 minutes the first time</li>
+<li>Maybe &lt; 20 seconds after</li>
+<li>May need to type password a few times</li>
+</ul>
+</section>
+<section id="osx-packages" class="level1">
+<h1>OSX packages</h1>
+<ul>
+<li>homebrew</li>
+<li>homebrew_cask</li>
+</ul>
+</section>
+<section id="homedir-in-git" class="level1">
+<h1>homedir in git</h1>
+<p><a href="https://spin.atomicobject.com/2015/02/21/ansible-git-directory/">&quot;Configuring a Git-Controlled Home Directory with Ansible&quot;</a></p>
+</section>
+<section id="recovering-from-mistakes" class="level1">
+<h1>Recovering from Mistakes</h1>
+<pre><code>$ ansible-playbook --start RESUME_AT</code></pre>
+</section>
+<section id="details" class="level1">
+<h1>Details</h1>
+<ul>
+<li><a href="https://github.com/atomicobject/ansible-laptop-playbook-example" class="uri">https://github.com/atomicobject/ansible-laptop-playbook-example</a></li>
+<li>Configuring a Laptop with Ansible, Parts <a href="https://spin.atomicobject.com/2015/09/21/ansible-configuration-management-laptop/">one</a> and <a href="http://spin.atomicobject.com/2015/09/22/ansible-config-example/">two</a></li>
+</ul>
+</section>
+<section id="thanks" class="level1">
+<h1><strong>Thanks</strong></h1>
+</section>
+<section id="questions" class="level1">
+<h1>Questions?</h1>
+</section>
+        </div>
+    </div>
+    <script src="reveal_js/lib/js/head.min.js"></script>
+    <script src="reveal_js/js/reveal.min.js"></script>
+    <script>
+        // Required, even if empty.
+        Reveal.initialize({
+            controls: false,
+            progress: false,
+            rollingLinks: false,
+            transition: "none",
+            maxScale: 10.0,
+        });
+    </script>
+</body>
+</html>
